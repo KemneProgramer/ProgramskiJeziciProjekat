@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<link rel="stylesheet" href="styles.css">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    
+    <h1>Transfer market</h1>
+    </div>
+    <br>
+    <br>
+    <br>
+    <nav class="navbar">
+        <ul class="nav-list">
+            <li><a href="https://miro.medium.com/v2/resize:fit:720/format:webp/1*d1yTPfcL5-CLpbxYEjLayA.jpeg">MBAPPE</a></li>
+            <li><a href="https://singidunum.ac.rs/">SINGI</a></li>
+            <li><a href="https://youtu.be/RHb5LKnnxLg?si=Rzk_qo8mbYpAoU7b&t=70">PESMICA</a></li>
+            <li><a href="https://web.coolinarika.com/recept/bakina-proja-sa-sirom-8216-projara-8217-36791016-63cf-11eb-8bbc-0242ac120015">RECEPT ZA PROJU
+            </a></li>
+            <li><a href="#AUTOR">NEMANJA MARJANOVIC</a></li>
+            <li><a href="#INDEKS">2022203072</a></li>
+        </ul>
+    </nav>
+    <br>
+    <br>
+
+
+    <marquee id="team-marquee"></marquee>
+    <br>
+    <div>
+        <h2>Slobodni agenti</h2>
+        <div id="igrac-list"></div>
+    </div>
+    <div>
+        <h2 id="team-title">Mete transfera</h2>
+        <div id="team-list"></div>
+    </div>
+
+    <script>
+        function loadIgraci() {
+            fetch('http://localhost:8080/igrac')
+                .then(response => response.json())
+                .then(igraci => {
+                    console.log('Igraci:', igraci); 
+                    const igracList = document.getElementById('igrac-list');
+                    igracList.innerHTML = '';
+                    igraci.forEach(igrac => {
+                        const igracItem = document.createElement('div');
+                        igracItem.id = `igrac-${igrac.igrac_id}`;
+                        igracItem.textContent = `${igrac.ime} ${igrac.prezime} (#${igrac.brojdresa})`;
+                        const addButton = document.createElement('button');
+                        addButton.textContent = 'Kupi igraca';
+                        addButton.onclick = () => moveToTeam(igrac.igrac_id);
+                        igracItem.appendChild(addButton);
+                        igracList.appendChild(igracItem);
+                    });
+                })
+                .catch(error => console.error('Error loading igraci:', error)); 
+        }
+
+        function moveToTeam(igracId) {
+    const igracItem = document.getElementById(`igrac-${igracId}`);
+    const teamList = document.getElementById('team-list');
+    if (igracItem && teamList) {
+        const clonedItem = igracItem.cloneNode(true); 
+        clonedItem.id = `igrac-team-${igracId}`; 
+        const addButton = clonedItem.querySelector('button');
+        addButton.textContent = 'Ipak ne';
+        addButton.onclick = () => moveToPool(igracId);
+        teamList.appendChild(clonedItem); 
+        igracItem.remove(); 
+    }
+}
+
+function moveToPool(igracId) {
+    const teamItem = document.getElementById(`igrac-team-${igracId}`);
+    const igracList = document.getElementById('igrac-list');
+    if (teamItem && igracList) {
+        const clonedItem = teamItem.cloneNode(true); 
+        clonedItem.id = `igrac-${igracId}`; 
+        const addButton = clonedItem.querySelector('button');
+        addButton.textContent = 'Kupi';
+        addButton.onclick = () => moveToTeam(igracId);
+        igracList.appendChild(clonedItem); 
+        teamItem.remove(); 
+    }
+}
+        
+        
+function loadTeams() {
+        fetch('http://localhost:8080/tim')
+        .then(response => response.json())
+            .then(teams => {
+                const teamMarquee = document.getElementById('team-marquee');
+                teamMarquee.innerHTML = 'Timovi na trzistu: '; // Add prefix
+                teams.forEach((team, index) => {
+                    if (index !== 0) {
+                        teamMarquee.innerHTML += ', '; // Add comma and space between team names
+                    }
+                    teamMarquee.innerHTML += `${team.imetima}`;
+                });
+            })
+            .catch(error => console.error('Error loading teams:', error));
+    }
+    window.onload = function() {
+        loadIgraci();
+        loadTeams();
+    }
+    </script>
+    
+</body>
+
+</html>
